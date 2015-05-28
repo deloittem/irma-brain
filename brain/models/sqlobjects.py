@@ -14,9 +14,10 @@
 # terms contained in the LICENSE file.
 
 import os
+from datetime import datetime, timedelta
 from brain.helpers.sql import sql_db_connect
 from sqlalchemy import Column, Integer, Float, String, \
-    event, ForeignKey
+    event, ForeignKey, DateTime
 import config.parser as config
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -25,7 +26,6 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from lib.irma.common.exceptions import IrmaDatabaseError, \
     IrmaDatabaseResultNotFound
 from lib.irma.common.utils import IrmaScanStatus
-from lib.common.compat import timestamp
 from lib.irma.database.sqlhandler import SQLDatabase
 from lib.irma.database.sqlobjects import SQLDatabaseObject
 
@@ -90,7 +90,7 @@ class Scan(Base, SQLDatabaseObject):
         name='status'
     )
     timestamp = Column(
-        Float(precision=2),
+        DateTime(),
         nullable=False,
         name='timestamp'
     )
@@ -111,7 +111,7 @@ class Scan(Base, SQLDatabaseObject):
     def __init__(self, frontend_scanid, user_id, nb_files):
         self.scan_id = frontend_scanid
         self.status = IrmaScanStatus.empty
-        self.timestamp = timestamp()
+        self.timestamp = datetime.utcnow()
         self.nb_files = nb_files
         self.user_id = user_id
 
@@ -218,7 +218,7 @@ class User(Base, SQLDatabaseObject):
             remaining = None
         else:
             # quota are per 24h
-            min_ts = timestamp() - 24 * 60 * 60
+            min_ts = datetime.utcnow() - timedelta(days=1)
             scan_list = session.query(Scan).filter(
                 Scan.user_id == self.id).filter(
                 Scan.timestamp >= min_ts).all()
@@ -267,12 +267,12 @@ class Job(Base, SQLDatabaseObject):
         name='status'
     )
     ts_start = Column(
-        Integer,
+        DateTime(),
         nullable=False,
         name='ts_start'
     )
     ts_end = Column(
-        Integer,
+        DateTime(),
         name='ts_end'
     )
     task_id = Column(
@@ -290,7 +290,7 @@ class Job(Base, SQLDatabaseObject):
     def __init__(self, filename, probename, scanid, taskid):
         self.filename = filename
         self.probename = probename
-        self.ts_start = timestamp()
+        self.ts_start = datetime.utcnow()
         self.status = self.running
         self.scan_id = scanid
         self.task_id = taskid

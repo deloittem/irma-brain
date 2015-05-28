@@ -1,5 +1,6 @@
 # for python
 *.pyc
+*~
 
 # for dev configuration files
 config/brain.ini

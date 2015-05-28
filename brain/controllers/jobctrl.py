@@ -13,10 +13,11 @@
 # modified, propagated, or distributed except according to the
 # terms contained in the LICENSE file.
 
+from datetime import datetime
+
 from brain.controllers import scanctrl
 from brain.models.sqlobjects import Job
 from brain.helpers.sql import session_query, session_transaction
-from lib.common.compat import timestamp
 
 
 def new(scan_id, filename, probe, task_id):
@@ -31,7 +32,7 @@ def _finish(job_id, status):
     with session_transaction() as session:
         job = Job.load(job_id, session)
         job.status = status
-        job.ts_end = timestamp()
+        job.ts_end = datetime.utcnow()
         job.update(['status', 'ts_end'], session)
         scan_id = job.scan.id
     scanctrl.check_finished(scan_id)
