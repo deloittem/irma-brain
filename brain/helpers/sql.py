@@ -16,6 +16,8 @@ def sql_db_connect():
         SQLDatabase.connect(uri_params[0], uri_params[1], uri_params[2],
                             uri_params[3], uri_params[4], uri_params[5])
     except Exception as e:
+        # LP: How catching an exception, hiding its meaning with a generic
+        #     message/exception type and throwing again could be of some use?
         msg = "SQL: can't connect"
         log.info("msg", exc_info=True)
         raise IrmaDatabaseError(msg)

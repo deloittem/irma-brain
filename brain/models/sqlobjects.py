@@ -297,6 +297,3 @@ class Job(Base, SQLDatabaseObject):
 
     def finished(self):
         return self.status != self.running
-
-
-Base.metadata.create_all(SQLDatabase.get_engine())
