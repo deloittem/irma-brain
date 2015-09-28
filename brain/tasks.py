@@ -191,6 +191,20 @@ def job_success(result, jobid):
 
 
 @results_app.task(ignore_result=True, acks_late=True)
+def job_additional_results(taskid, result):
+    try:
+        (frontend_scanid, filename, probe) = job_ctrl.info_by_taskid(taskid)
+        log.info("scanid %s taskid:%d probe %s Additional results received",
+                 frontend_scanid,
+                 taskid,
+                 probe)
+        celery_frontend.scan_result(frontend_scanid, filename, probe, result)
+    except:
+        log.info("exception", exc_info=True)
+        return
+
+
+@results_app.task(ignore_result=True, acks_late=True)
 def job_error(parent_taskid, jobid):
     try:
         (frontend_scanid, filename, probe) = job_ctrl.info(jobid)

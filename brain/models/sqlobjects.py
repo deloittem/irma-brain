@@ -277,7 +277,8 @@ class Job(Base, SQLDatabaseObject):
     )
     task_id = Column(
         String,
-        name="task_id"
+        name="task_id",
+        index=True
     )
     # Many to one Job <-> Scan
     scan_id = Column(
@@ -294,6 +295,26 @@ class Job(Base, SQLDatabaseObject):
         self.status = self.running
         self.scan_id = scanid
         self.task_id = taskid
+
+    @classmethod
+    def load_from_taskid(cls, taskid, session):
+        """Find the object in the database
+        :param taskid: the taskid to look for
+        :param session: the session to use
+        :rtype: cls
+        :return: the job object that corresponds to the taskid
+        :raise: IrmaDatabaseResultNotFound, IrmaDatabaseError,
+                IrmaFileSystemError
+        """
+        try:
+            asked_job = session.query(cls).filter(
+                cls.task_id == taskid
+            ).one()
+        except NoResultFound as e:
+            raise IrmaDatabaseResultNotFound(e)
+        except MultipleResultsFound as e:
+            raise IrmaDatabaseError(e)
+        return asked_job
 
     def finished(self):
         return self.status != self.running

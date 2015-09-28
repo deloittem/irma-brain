@@ -93,12 +93,14 @@ def check_finished(scan_id):
 
 
 def flush(scan_id):
+    # TODO add a parameter to keep job requiring
+    # additional results
     with session_transaction() as session:
         scan = Scan.load(scan_id, session)
         if scan.status == IrmaScanStatus.flushed:
             return
-        for job in scan.jobs:
-            session.delete(job)
+        # for job in scan.jobs:
+        #    session.delete(job)
         scan.status = IrmaScanStatus.flushed
 
 

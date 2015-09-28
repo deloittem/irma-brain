@@ -60,6 +60,15 @@ def info(job_id):
         return (frontend_scan_id, filename, probe)
 
 
+def info_by_taskid(task_id):
+    with session_query() as session:
+        job = Job.load_from_taskid(task_id, session)
+        frontend_scan_id = job.scan.scan_id
+        filename = job.filename
+        probe = job.probename
+        return (frontend_scan_id, filename, probe)
+
+
 def duration(job_id):
     with session_query() as session:
         job = Job.load(job_id, session)
