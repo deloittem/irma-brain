@@ -24,4 +24,6 @@ def flush_dir(ftpuser, scanid):
                 conf_ftp.port,
                 conf_ftp.username,
                 conf_ftp.password) as ftps:
-        ftps.deletepath("{0}/{1}".format(ftpuser, scanid), deleteParent=True)
+        if not ftps.is_file(ftpuser, scanid):
+            ftps.deletepath("{0}/{1}".format(ftpuser, scanid),
+                            deleteParent=True)
