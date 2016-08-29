@@ -23,6 +23,7 @@ def flush_dir(ftpuser, scanid):
     with IrmaFTP(conf_ftp.host,
                  conf_ftp.port,
                  conf_ftp.auth,
+                 conf_ftp.key_path,
                  conf_ftp.username,
                  conf_ftp.password,
                  dst_user=ftpuser) as ftp:
